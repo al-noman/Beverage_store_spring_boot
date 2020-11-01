@@ -2,7 +2,7 @@ package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.co
 
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.converters.GenericMapper;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.AbstractDTO;
-import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.AbstractEntity;
+import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.WithId;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.service.CrudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
-public abstract class CRUDController<ENTITY extends AbstractEntity, DTO extends AbstractDTO> {
+public abstract class CRUDController<ENTITY extends WithId, DTO extends AbstractDTO> {
 
     @Autowired
     protected CrudService<ENTITY> crudService;

@@ -1,12 +1,21 @@
 package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "beverage_boot")
-public class BeverageEntity extends AbstractEntity{
+public class BeverageEntity implements WithId, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @Version
+    private int version;
 
     @Column(name = "manufacturer")
     private String manufacturer;
@@ -87,15 +96,34 @@ public class BeverageEntity extends AbstractEntity{
     }
 
     @Override
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    @Override
     public String toString() {
         return "BeverageEntity{" +
-                "manufacturer='" + manufacturer + '\'' +
+                "id=" + id +
+                ", version=" + version +
+                ", manufacturer='" + manufacturer + '\'' +
                 ", name='" + name + '\'' +
                 ", quantity=" + quantity +
                 ", availableQuantity=" + availableQuantity +
                 ", price=" + price +
                 ", incentiveEntity=" + incentiveEntity +
                 ", customerOrderEntities=" + customerOrderEntities +
-                "} " + super.toString();
+                '}';
     }
 }

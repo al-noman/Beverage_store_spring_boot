@@ -1,6 +1,7 @@
 package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,7 +9,15 @@ import java.util.Set;
 @Table(name = "incentive_boot")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
-public abstract class IncentiveEntity extends AbstractEntity {
+public abstract class IncentiveEntity implements WithId, Serializable {
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.TABLE)
+    private int id;
+
+    @Version
+    private int version;
 
     @Column(name = "name")
     private String name;
@@ -43,10 +52,28 @@ public abstract class IncentiveEntity extends AbstractEntity {
         this.beverageEntities = beverageEntities;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "IncentiveEntity{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", version=" + version +
+                ", name='" + name + '\'' +
                 ", dtype='" + dtype + '\'' +
                 ", beverageEntities=" + beverageEntities +
                 "} " + super.toString();

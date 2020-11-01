@@ -2,11 +2,17 @@ package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dt
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.PositiveOrZero;
+
 import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 
 public class BeverageDTO extends AbstractDTO{
+
+    @NotEmpty
     private String manufacturer;
 
+    @NotEmpty
     private String name;
 
     private int quantity;
@@ -14,6 +20,7 @@ public class BeverageDTO extends AbstractDTO{
     @JsonProperty(access = READ_ONLY)
     private int availableQuantity;
 
+    @PositiveOrZero
     private double price;
 
     public String getManufacturer() {
