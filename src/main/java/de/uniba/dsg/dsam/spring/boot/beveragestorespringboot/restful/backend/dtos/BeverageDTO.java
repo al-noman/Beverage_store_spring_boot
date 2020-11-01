@@ -15,6 +15,7 @@ public class BeverageDTO extends AbstractDTO{
     @NotEmpty
     private String name;
 
+    @PositiveOrZero
     private int quantity;
 
     @JsonProperty(access = READ_ONLY)
@@ -22,6 +23,8 @@ public class BeverageDTO extends AbstractDTO{
 
     @PositiveOrZero
     private double price;
+
+    private IncentiveDTO incentiveDTO;
 
     public String getManufacturer() {
         return manufacturer;
@@ -61,6 +64,14 @@ public class BeverageDTO extends AbstractDTO{
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public IncentiveDTO getIncentiveDTO() {
+        return incentiveDTO;
+    }
+
+    public void setIncentiveDTO(IncentiveDTO incentiveDTO) {
+        this.incentiveDTO = incentiveDTO;
     }
 
     @Override
