@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: beverage-store-spring-boot
+  datasource:
+    url: 'jdbc:postgresql://localhost:5432/BeverageStore'
+    username: tester
+    password: tester
+    driver-class-name: org.postgresql.Driver
+    # Keep the connection alive if idle for a long time (needed in production)
+    hikari:
+      connection-test-query: 'SELECT 1'
+      maximum-pool-size: 10
+    jpa:
+      properties:
+        hibernate:
+#          id.new_generator_mappings: false
+#          globally_quoted_identifiers: true
+          jdbc:
+            time_zone: 'UTC'
+    # =============================================================================================
+    # = Flyway
+    # =============================================================================================
+    flyway.clean-on-validation-error: false
+  flyway:
+    baseline-on-migrate: true
+server:
+  port: 8081
+
+logging:
+  level:
+    ROOT: info
