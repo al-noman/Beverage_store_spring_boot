@@ -13,6 +13,10 @@ public interface IncentiveMapper extends GenericMapper<IncentiveEntity, Incentiv
 
     @Override
     default IncentiveDTO convertEntityToDTO(IncentiveEntity incentiveEntity){
+        if (incentiveEntity == null){
+            return null;
+        }
+
         if (incentiveEntity.getClass().equals(PromotionalGiftEntity.class)){
             return promoEntityToDto((PromotionalGiftEntity) incentiveEntity);
         }
@@ -23,6 +27,10 @@ public interface IncentiveMapper extends GenericMapper<IncentiveEntity, Incentiv
 
     @Override
     default IncentiveEntity convertDTOToEntity(IncentiveDTO incentiveDTO){
+        if (incentiveDTO == null){
+            return null;
+        }
+
         if (incentiveDTO.getClass().equals(PromotionalGiftDTO.class)){
             return promoDtoToEntity((PromotionalGiftDTO)incentiveDTO);
         }
