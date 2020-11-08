@@ -26,6 +26,12 @@ spring:
 server:
   port: 8081
 
+beveragestore:
+  rabbitmq:
+    exchange: 'beverage_store_exchange'
+    queue: 'beverage_store_queue'
+    routing_key: 'beverage_store_routing_key'
+
 logging:
   level:
     ROOT: info

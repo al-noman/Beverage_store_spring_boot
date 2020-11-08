@@ -1,27 +1,18 @@
 package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.validation.constraints.Positive;
 import java.util.Date;
 
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
+public class CustomerOrderDTO extends AbstractDTO {
 
-public final class CustomerOrderDTO extends AbstractDTO {
-
-    @JsonProperty(access = READ_ONLY)
     private Date issueDate;
 
-    @JsonProperty(access = WRITE_ONLY)
     @Positive
     private int orderAmount;
 
-    @JsonProperty(access = WRITE_ONLY)
     @Positive
     private int beverageId;
 
-    @JsonProperty(access = READ_ONLY)
     private BeverageDTO beverageDTO;
 
     /**

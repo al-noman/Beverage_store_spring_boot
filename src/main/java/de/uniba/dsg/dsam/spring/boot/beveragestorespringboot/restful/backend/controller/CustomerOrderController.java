@@ -1,11 +1,12 @@
 package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.controller;
 
+import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.configuration.RabbitMQConfigConstants;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.converters.GenericMapper;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.BeverageDTO;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.CustomerOrderDTO;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.BeverageEntity;
-import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.CustomerOrderEntity;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.service.CrudService;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,17 +22,17 @@ public class CustomerOrderController {
 
     private final CrudService<BeverageEntity> beverageService;
     private final GenericMapper<BeverageEntity, BeverageDTO> beverageConverter;
-    private final CrudService<CustomerOrderEntity> customerOrderService;
-    private final GenericMapper<CustomerOrderEntity, CustomerOrderDTO> customerOrderConverter;
+    private final RabbitMQConfigConstants configConstants;
+    private final RabbitTemplate rabbitTemplate;
 
     public CustomerOrderController(CrudService<BeverageEntity> beverageService,
                                    GenericMapper<BeverageEntity, BeverageDTO> beverageConverter,
-                                   CrudService<CustomerOrderEntity> customerOrderService,
-                                   GenericMapper<CustomerOrderEntity, CustomerOrderDTO> customerOrderConverter) {
+                                   RabbitMQConfigConstants configConstants,
+                                   RabbitTemplate rabbitTemplate) {
         this.beverageService = beverageService;
         this.beverageConverter = beverageConverter;
-        this.customerOrderService = customerOrderService;
-        this.customerOrderConverter = customerOrderConverter;
+        this.configConstants = configConstants;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @PostMapping
@@ -48,10 +49,14 @@ public class CustomerOrderController {
             customerOrderDTO.setBeverageDTO(beverageDTO);
             customerOrderDTO.setIssueDate(new Date());
 
-            // TODO
-            // customerOrderService.addOne(customerOrderConverter.convertDTOToEntity(customerOrderDTO));
+            // Publishing to RabbitMQ
+            CustomerOrderDTO receivedDto = (CustomerOrderDTO) rabbitTemplate.convertSendAndReceive(
+                    configConstants.getExchange(),
+                    configConstants.getRoutingKey(),
+                    customerOrderDTO);
+            customerOrderDTO.setId(receivedDto.getId());
+            customerOrderDTO.setVersion(receivedDto.getVersion());
         });
-
         return dtos;
     }
 }
