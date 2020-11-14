@@ -2,7 +2,7 @@ spring:
   application:
     name: beverage-store-spring-boot
   datasource:
-    url: 'jdbc:postgresql://localhost:5432/BeverageStore'
+    url: 'jdbc:postgresql://localhost:5432/BeverageStoreBoot'
     username: tester
     password: tester
     driver-class-name: org.postgresql.Driver

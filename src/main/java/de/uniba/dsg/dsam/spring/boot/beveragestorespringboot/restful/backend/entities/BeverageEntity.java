@@ -7,7 +7,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "beverage_boot")
-public class BeverageEntity implements WithId, Serializable {
+public class BeverageEntity implements WithIdAndVersion, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -25,9 +25,6 @@ public class BeverageEntity implements WithId, Serializable {
 
     @Column(name = "quantity")
     private int quantity;
-
-    @Column(name = "available_quantity")
-    private int availableQuantity;
 
     @Column(name = "price")
     private double price;
@@ -61,14 +58,6 @@ public class BeverageEntity implements WithId, Serializable {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public int getAvailableQuantity() {
-        return availableQuantity;
-    }
-
-    public void setAvailableQuantity(int availableQuantity) {
-        this.availableQuantity = availableQuantity;
     }
 
     public double getPrice() {
@@ -120,7 +109,6 @@ public class BeverageEntity implements WithId, Serializable {
                 ", manufacturer='" + manufacturer + '\'' +
                 ", name='" + name + '\'' +
                 ", quantity=" + quantity +
-                ", availableQuantity=" + availableQuantity +
                 ", price=" + price +
                 ", incentiveEntity=" + incentiveEntity +
                 ", customerOrderEntities=" + customerOrderEntities +

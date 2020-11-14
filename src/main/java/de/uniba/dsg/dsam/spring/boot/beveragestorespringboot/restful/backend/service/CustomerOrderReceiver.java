@@ -17,7 +17,6 @@ public class CustomerOrderReceiver extends AbstractCRUDServiceImpl<CustomerOrder
 
     @RabbitListener(queues = "${beveragestore.rabbitmq.queue}")
     public CustomerOrderDTO receiveCustomerOrder(CustomerOrderDTO customerOrderDTO){
-        System.out.println(customerOrderDTO);
         CustomerOrderEntity entity = this.repository.save(this.converter.convertDTOToEntity(customerOrderDTO));
         return this.converter.convertEntityToDTO(entity);
     }

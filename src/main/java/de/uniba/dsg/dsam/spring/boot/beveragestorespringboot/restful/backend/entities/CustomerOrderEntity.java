@@ -6,7 +6,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "customer_order_boot")
-public class CustomerOrderEntity implements WithId, Serializable {
+public class CustomerOrderEntity implements WithIdAndVersion, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

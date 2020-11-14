@@ -5,6 +5,7 @@ import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.con
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.BeverageDTO;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.CustomerOrderDTO;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.BeverageEntity;
+import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.exception.BadRequestParamValueException;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.service.CrudService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
@@ -44,8 +45,13 @@ public class CustomerOrderController {
             BeverageEntity beverageEntity = beverageService.getOne(beverageId)
                     .orElseThrow(() -> new EntityNotFoundException(String.valueOf(beverageId)));
             BeverageDTO beverageDTO = beverageConverter.convertEntityToDTO(beverageEntity);
-            beverageDTO.setQuantity(customerOrderDTO.getOrderAmount());
-            beverageDTO.setAvailableQuantity(beverageDTO.getAvailableQuantity() - beverageDTO.getQuantity());
+
+            if (beverageDTO.getQuantity() < customerOrderDTO.getOrderAmount()){
+                throw new BadRequestParamValueException("orderAmount", "customer order amount exceeds " +
+                        "available beverage quantity");
+            }
+
+            beverageDTO.setQuantity(beverageDTO.getQuantity() - customerOrderDTO.getOrderAmount());
             customerOrderDTO.setBeverageDTO(beverageDTO);
             customerOrderDTO.setIssueDate(new Date());
 
@@ -56,6 +62,8 @@ public class CustomerOrderController {
                     customerOrderDTO);
             customerOrderDTO.setId(receivedDto.getId());
             customerOrderDTO.setVersion(receivedDto.getVersion());
+
+            this.beverageService.updateOne(this.beverageConverter.convertDTOToEntity(beverageDTO));
         });
         return dtos;
     }

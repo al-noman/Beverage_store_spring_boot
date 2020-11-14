@@ -1,11 +1,10 @@
 CREATE TABLE beverage_boot
 (
     id integer NOT NULL,
-    available_quantity integer,
     manufacturer character varying(255),
     name character varying(255),
-    price double precision,
     quantity integer,
+    price double precision,
     version integer,
     incentive_boot_id integer,
     CONSTRAINT beverage_boot_pkey PRIMARY KEY (id),

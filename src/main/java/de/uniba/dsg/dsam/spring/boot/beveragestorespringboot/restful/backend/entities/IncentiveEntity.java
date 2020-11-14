@@ -9,7 +9,7 @@ import java.util.Set;
 @Table(name = "incentive_boot")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
-public abstract class IncentiveEntity implements WithId, Serializable {
+public abstract class IncentiveEntity implements WithIdAndVersion, Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

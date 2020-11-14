@@ -1,11 +1,7 @@
 package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PositiveOrZero;
-
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
 
 public class BeverageDTO extends AbstractDTO{
 
@@ -17,9 +13,6 @@ public class BeverageDTO extends AbstractDTO{
 
     @PositiveOrZero
     private int quantity;
-
-    @JsonProperty(access = READ_ONLY)
-    private int availableQuantity;
 
     @PositiveOrZero
     private double price;
@@ -50,14 +43,6 @@ public class BeverageDTO extends AbstractDTO{
         this.quantity = quantity;
     }
 
-    public int getAvailableQuantity() {
-        return availableQuantity;
-    }
-
-    public void setAvailableQuantity(int availableQuantity) {
-        this.availableQuantity = availableQuantity;
-    }
-
     public double getPrice() {
         return price;
     }
@@ -81,7 +66,6 @@ public class BeverageDTO extends AbstractDTO{
                 "manufacturer='" + manufacturer + '\'' +
                 ", name='" + name + '\'' +
                 ", quantity=" + quantity +
-                ", availableQuantity=" + availableQuantity +
                 ", price=" + price +
                 '}';
     }

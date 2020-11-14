@@ -22,14 +22,12 @@ public class SalesReportController {
     @GetMapping(path = "/summary")
     public List<SummaryReport> getSalesReport(){
         List<SummaryReport> entities = this.customerOrderRepository.getSummaryReport();
-        entities.forEach(entity -> System.out.println(entity));
         return entities;
     }
 
     @GetMapping(path = "/detail")
     public List<DetailedReport> getReportBrokenToIncentive(){
         List<DetailedReport> entities = this.customerOrderRepository.getDetailedReport();
-        entities.forEach(entity -> System.out.println(entity));
         return entities;
     }
 }
