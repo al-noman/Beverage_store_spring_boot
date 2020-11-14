@@ -23,7 +23,7 @@ public class CustomerOrderEntity implements WithId, Serializable {
     private int orderAmount;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "beverage_boot_id")
+    @JoinColumn(name = "beverage_boot_id", referencedColumnName = "id")
     private BeverageEntity beverageEntity;
 
     public CustomerOrderEntity() {
