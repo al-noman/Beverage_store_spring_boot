@@ -3,12 +3,12 @@ package de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.co
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.converters.GenericMapper;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.AbstractDTO;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.WithIdAndVersion;
+import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.exception.EntityNotFoundException;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.service.CrudService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +38,7 @@ public abstract class CRUDController<ENTITY extends WithIdAndVersion, DTO extend
         Optional<ENTITY> maybeEntity = this.crudService.getOne(id);
         return maybeEntity
                 .map(entity -> this.mapper.convertEntityToDTO(entity))
-                .orElseThrow(() -> new EntityNotFoundException(""));
+                .orElseThrow(() -> new EntityNotFoundException(id));
     }
 
     @PostMapping
@@ -53,7 +53,7 @@ public abstract class CRUDController<ENTITY extends WithIdAndVersion, DTO extend
     @ResponseStatus(HttpStatus.OK)
     public DTO updateOne(@PathVariable int id, @Valid @RequestBody DTO dto){
         Optional<ENTITY> maybeEntity = this.crudService.getOne(id);
-        ENTITY entity = maybeEntity.orElseThrow(() -> new EntityNotFoundException());
+        ENTITY entity = maybeEntity.orElseThrow(() -> new EntityNotFoundException(id));
         dto.setId(entity.getId());
         dto.setVersion(entity.getVersion());
         return this.mapper.convertEntityToDTO(
@@ -70,7 +70,7 @@ public abstract class CRUDController<ENTITY extends WithIdAndVersion, DTO extend
     @DeleteMapping(path = "/{id}")
     public void deleteOne(@PathVariable int id){
         Optional<ENTITY> maybeEntity = this.crudService.getOne(id);
-        maybeEntity.orElseThrow(() -> new EntityNotFoundException());
+        maybeEntity.orElseThrow(() -> new EntityNotFoundException(id));
         this.crudService.deleteOne(id);
     }
 }

@@ -6,17 +6,19 @@ import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dto
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.dtos.CustomerOrderDTO;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.entities.BeverageEntity;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.exception.BadRequestParamValueException;
+import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.exception.EntityNotFoundException;
 import de.uniba.dsg.dsam.spring.boot.beveragestorespringboot.restful.backend.service.CrudService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.util.Date;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping(path = "/customer_order")
 public class CustomerOrderController {
@@ -43,7 +45,7 @@ public class CustomerOrderController {
         dtos.forEach(customerOrderDTO -> {
             int beverageId = customerOrderDTO.getBeverageId();
             BeverageEntity beverageEntity = beverageService.getOne(beverageId)
-                    .orElseThrow(() -> new EntityNotFoundException(String.valueOf(beverageId)));
+                    .orElseThrow(() -> new EntityNotFoundException(beverageId));
             BeverageDTO beverageDTO = beverageConverter.convertEntityToDTO(beverageEntity);
 
             if (beverageDTO.getQuantity() < customerOrderDTO.getOrderAmount()){
