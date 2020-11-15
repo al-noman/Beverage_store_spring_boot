@@ -34,3 +34,9 @@ beveragestore:
 logging:
   level:
     ROOT: info
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, loggers, metrics, mappings
