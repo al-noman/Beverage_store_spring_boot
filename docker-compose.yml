@@ -6,10 +6,16 @@ services:
     build: ./
     environment:
       - DB_HOST=dbpostgresql
+      - RABBIT_HOST=rabbitmq
+      - BEVERAGE_STORE_EXCHANGE=beverage_store_exchange
+      - BEVERAGE_STORE_QUEUE=beverage_store_queue
+      - BEVERAGE_STORE_ROUTING_KEY=beverage_store_routing_key
     ports:
       - "8080:8080"
     depends_on:
       - dbpostgresql
+      - rabbitmq
+
   dbpostgresql:
     image: postgres
     ports:
@@ -18,3 +24,13 @@ services:
       - POSTGRES_PASSWORD=tester
       - POSTGRES_USER=tester
       - POSTGRES_DB=beveragestoreboot
+
+  rabbitmq:
+    image: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - BEVERAGE_STORE_EXCHANGE=beverage_store_exchange
+      - BEVERAGE_STORE_QUEUE=beverage_store_queue
+      - BEVERAGE_STORE_ROUTING_KEY=beverage_store_routing_key

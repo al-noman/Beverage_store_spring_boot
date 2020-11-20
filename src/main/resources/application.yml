@@ -22,13 +22,15 @@ spring:
     baseline-on-migrate: true
   jpa:
     show-sql: true
+  rabbitmq:
+    host: ${RABBIT_HOST}
 server:
   port: 8080
 beveragestore:
   rabbitmq:
-    exchange: 'beverage_store_exchange'
-    queue: 'beverage_store_queue'
-    routing_key: 'beverage_store_routing_key'
+    exchange: ${BEVERAGE_STORE_EXCHANGE} #'beverage_store_exchange'
+    queue: ${BEVERAGE_STORE_QUEUE} #'beverage_store_queue'
+    routing_key: ${BEVERAGE_STORE_ROUTING_KEY} #'beverage_store_routing_key'
 logging:
   level:
     ROOT: info
