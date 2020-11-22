@@ -1,8 +1,8 @@
 version: '3.3'
 services:
   app:
-    container_name: app-springboot-postgresql
-    image: app-springboot-postgresql
+    container_name: beverage-store-spring-boot
+    image: alnoman/beverage-store-spring-boot
     build: ./
     environment:
       - DB_HOST=dbpostgresql
