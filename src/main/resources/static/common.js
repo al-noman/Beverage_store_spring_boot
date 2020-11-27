@@ -1,28 +1,61 @@
 
-$(document).on("click", ".menu-section .row", function (e){
+$(document).on("click", ".menu-section .row .btn", function (e){
     $(".container").removeAttr("align");
     $(".dynamic-content").remove();
     $(".homepage").hide();
     let $dataContent = $(".data-content").clone();
     $dataContent.addClass("dynamic-content");
 
-    let $dataItem = $(this).find(".btn").attr("data-menu");
+    let $dataItem = $(this).attr("data-menu");
+    let columns;
     switch ($dataItem) {
        case "incentiveMenu":
-           let columns = ["#", "ID", "NAME", "TYPE", "ACTION"];
+           columns = ["#", "ID", "NAME", "TYPE", "ACTION"];
            createTableDefinition("Incentive Management", "Create new incentive",
                $dataContent, columns);
-           getDataFromBackend("incentives", populateIncentiveTable);
+           getDataFromBackend("incentives", populateTable);
            break;
+        case "beverageMenu":
+            columns = ["#", "ID", "NAME", "MANUFACTURER", "QUANTITY", "PRICE", "INCENTIVE_ID",
+                "INCENTIVE_NAME", "INCENTIVE_TYPE", "ACTION"];
+            createTableDefinition("Beverage Management", "Create new beverage",
+                $dataContent, columns);
+            getDataFromBackend("beverages", populateTable);
+            break;
+        case "orderMenu":
+            columns = ["#", "MANUFACTURER", "NAME", "PRICE",
+                "QUANTITY", "INCENTIVE_NAME", "SELECTION", "ORDER QUANTITY"];
+            createTableDefinition("Beverages For Order", null,
+                $dataContent, columns);
+            getDataFromBackend("customerOrder", populateTable);
+            break;
+        case "reportMenu":
+            columns = ["#", "ORDER_ID", "REVENUE"];
+            createTableDefinition("Report summary", null,
+                $dataContent, columns);
+            getDataFromBackend("sales-report/summary", populateTable);
+            $(".dynamic-content .home-button").remove();
+            getDataFromBackend("sales-report/detail", populateDetailReportTable);
+            break;
        default:
-           alert("something else");
+           console.log("something else");
     }
+});
+
+$(document).on("click", ".home-button", function (e){
+    $(".dynamic-content").remove();
+    $(".homepage").show();
 });
 
 function createTableDefinition($contentLabel, $createButtonText, $dataContent, $columns) {
     $(".container").append($dataContent);
     $dataContent.find(".content-label").text($contentLabel);
-    $dataContent.find(".create-button").text($createButtonText);
+    if ($createButtonText != null){
+        $dataContent.find(".create-button").text($createButtonText);
+    }
+    else {
+        $dataContent.find(".create-button").remove();
+    }
     $dataContent.show();
 
     let $columnDef = $dataContent.find("thead tr th").clone();
@@ -37,7 +70,7 @@ function createTableDefinition($contentLabel, $createButtonText, $dataContent, $
     $(".container").append($dataContent)
 }
 
-function populateIncentiveTable($data){
+function populateTable($data){
     if ($data.status == "success"){
         console.log($data);
         let $columnDef = $(".dynamic-content").find("table tbody tr td").clone();
@@ -52,6 +85,12 @@ function populateIncentiveTable($data){
         else if ($data.resource == "beverages"){
             $props = ["id", "name", "manufacturer", "quantity", "price", "incentiveId", "incentiveName", "incentiveType"];
         }
+        else if ($data.resource == "customerOrder"){
+            $props = ["manufacturer", "name", "price", "quantity", "incentiveName"];
+        }
+        else if ($data.resource == "sales-report/summary"){
+            $props = ["customerOrderId", "revenue"];
+        }
         for (let i=0; i<$data.length; i++){
             let $rowItem = $rowDef.clone();
             $rowItem.empty();
@@ -61,9 +100,12 @@ function populateIncentiveTable($data){
             $rowItem.append($columnItem);
 
             if ($data.resource == "beverages"){
-                $data[i].incentiveId = $data[i].incentiveDTO.id;
-                $data[i].incentiveName = $data[i].incentiveDTO.name;
-                $data[i].incentiveType = $data[i].incentiveDTO.incentive_type;
+                $data[i].incentiveId = $data[i].incentiveDTO != null ? $data[i].incentiveDTO.id : "-";
+                $data[i].incentiveName = $data[i].incentiveDTO != null ? $data[i].incentiveDTO.name : "-";
+                $data[i].incentiveType = $data[i].incentiveDTO != null ? $data[i].incentiveDTO.incentive_type : "-";
+            }
+            else if ($data.resource == "customerOrder"){
+                $data[i].incentiveName = $data[i].incentiveDTO != null ? $data[i].incentiveDTO.name : "-";
             }
 
             $props.forEach($property => {
@@ -72,10 +114,23 @@ function populateIncentiveTable($data){
                 $rowItem.append($columnItem);
             });
 
-            let $actionColumn = '<td><p><a class="btn btn-primary update" data-resource="'+$data.resource+'" ' +
-                'data-id="'+$data[i].id+'">Update</a> <a class="btn btn-primary delete" ' +
-                'data-resource="'+$data.resource+'" data-id="'+$data[i].id+'">Delete</a> </p></td>';
-            $rowItem.append($actionColumn);
+            let $actionColumn;
+            if ($data.resource == "customerOrder"){
+                $actionColumn = '<td><div class="col-xs" align="center"><input type="checkbox" name="selectedBeverage" ' +
+                    'value="'+$data[i].id+'"></div></td>';
+                $rowItem.append($actionColumn);
+
+                $actionColumn = '<td><div class="col-xs" align="center"><input type="number" name="quantity" min="0" '+
+                    'data-id="'+$data[i].id+'" max="'+$data[i].quantity+'" value="0"></div></td>';
+                $rowItem.append($actionColumn);
+                $(".dynamic-content .order-submit-button").show();
+            }
+            else if (!$data.resource.includes("sales-report")){
+                $actionColumn = '<td><p><a class="btn btn-primary update" data-resource="'+$data.resource+'" ' +
+                    'data-id="'+$data[i].id+'">Update</a> <a class="btn btn-primary delete" ' +
+                    'data-resource="'+$data.resource+'" data-id="'+$data[i].id+'">Delete</a> </p></td>';
+                $rowItem.append($actionColumn);
+            }
 
             $tableDef.append($rowItem);
         }
@@ -85,7 +140,28 @@ function populateIncentiveTable($data){
     }
 }
 
-function getDataFromBackend($resourceUrl, callbackMethod){
+function populateDetailReportTable($data){
+    $(".dynamic-content").append("<h2>Report broken down to incentive type</h2>");
+    let $detailReportTable = $(".dynamic-content .table-responsive").clone();
+    $detailReportTable.addClass("detail-report");
+
+    $tableBody = $detailReportTable.find("tbody");
+    $tableBody.empty();
+
+    for (let i=0; i<$data.length; i++){
+        let $html = '<tr><td>'+(i+1)+'</td><td>'+$data[i].incentiveType+'</td><td>'+$data[i].revenue+'</td></tr>';
+        $tableBody.append($html);
+    }
+    $(".dynamic-content").append($detailReportTable);
+    $(".detail-report th:nth-child(2)").text("INCENTIVE_TYPE");
+    $(".dynamic-content").append('<p class="btn btn-primary home-button">Home</p>');
+}
+
+function getDataFromBackend($resource, callbackMethod){
+    let $resourceUrl = $resource;
+    if ($resource == "customerOrder"){
+        $resourceUrl = "beverages";
+    }
     $.ajax({
         url: '/' + $resourceUrl,
         type: 'GET',
@@ -94,7 +170,7 @@ function getDataFromBackend($resourceUrl, callbackMethod){
             console.log("request successful");
             data.status = textStatus;
             data.statusCode = jqxhr.status;
-            data.resource = $resourceUrl;
+            data.resource = $resource;
             callbackMethod(data);
         },
         error: function (jqxhr){
@@ -102,7 +178,7 @@ function getDataFromBackend($resourceUrl, callbackMethod){
             let data = jqxhr.responseJSON;
             data.status = jqxhr.statusText;
             data.statusCode = jqxhr.status;
-            data.resource = $resourceUrl;
+            data.resource = $resource;
             callbackMethod(data);
         }
     });
