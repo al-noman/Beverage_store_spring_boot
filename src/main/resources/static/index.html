@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:display="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Beverage Store</title>
+
+        <!-- Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+        <script src="common.js"></script>
+    </head>
+    <body>
+        <div class="container" align="center">
+
+            <!-- Homepage view for menu items -->
+            <div class="homepage">
+                <h1 align="center" style="color: red"><i>
+                    <marquee scrollamount="10">Welcome to Beverage Store</marquee>
+                </i></h1>
+                <div>&nbsp;</div>
+                <div>&nbsp;</div>
+
+                <div class="menu-section">
+                    <div class="row">
+                        <div class="col-xs-1 col-md-2"></div>
+                        <div class="col-xs-4 col-md-4" align="center">
+                            <p class="btn btn-success btn-block" style="color: #000000"></p>
+                        </div>
+                        <div class="col-xs-1 col-md-2"></div>
+                    </div>
+
+                    <div class="row">
+                        <div>&nbsp;</div>
+                    </div>
+                    </br>
+                </div>
+            </div>
+
+
+            <!-- Tabular format view for different menu items, like Beverage, Incentives, Sales report, Order -->
+            <div class="data-content" style="display: none">
+                <h1 class="content-label"></h1>
+                <p class="btn btn-primary create-button"></p></br><p></p>
+                <span class="text-success" id="success-text"></span>
+                <!--    <% request.getSession().removeAttribute("messages"); %>-->
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="btn btn-primary home-button">Home</p>
+            </div>
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                let $menuSection = $(".homepage .menu-section");
+                let $innerItem = $menuSection.children();
+                let $orderItem, $beverageItem, $incentiveItem, $reportItem;
+                $beverageItem = $innerItem.clone();
+                $reportItem = $innerItem.clone();
+                $orderItem = $innerItem.clone();
+                $incentiveItem = $innerItem.clone();
+
+                let orderItemText = $orderItem.find(".btn").attr("data-menu", "orderMenu");
+                orderItemText.text("CREATE NEW ORDER");
+                let beverageItemText = $beverageItem.find(".btn").attr("data-menu", "beverageMenu");
+                beverageItemText.text("MANAGE BEVERAGES");
+                let incentiveItemText = $incentiveItem.find(".btn").attr("data-menu", "incentiveMenu");
+                incentiveItemText.text("MANAGE INCENTIVES");
+                let reportItemText = $reportItem.find(".btn").attr("data-menu", "reportMenu");
+                reportItemText.text("VIEW SALES REPORT");
+
+                $menuSection.empty();
+                $menuSection.append($orderItem);
+                $menuSection.append($beverageItem);
+                $menuSection.append($incentiveItem);
+                $menuSection.append($reportItem);
+            });
+        </script>
+
+    </body>
+</html>
