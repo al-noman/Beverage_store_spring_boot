@@ -12,6 +12,7 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         <script src="common.js"></script>
+        <script src="form-control.js"></script>
     </head>
     <body>
         <div class="container" align="center">
@@ -63,38 +64,82 @@
                     </table>
                 </div>
                 <div class="order-submit-button" align="center" style="display: none">
-                    <p class="btn btn-primary btn-success">Submit</p>
+                    <p class="btn btn-primary btn-success order-button">Submit</p>
                 </div>
                 <p class="btn btn-primary home-button">Home</p>
             </div>
+
+            <!-- Form processing page -->
+            <div class="form-page" style="display: none">
+                <h1 class="form-title"></h1>
+                <p>&nbsp;</p>
+
+                <form role="form">
+                    <div class="form-group input-text">
+                        <div class="input-group">
+                            <span class="input-group-addon input-label"></span>
+                            <span class="text-danger input-error"></span>
+                            <input name="" type="text" class="form-control" value="">
+                        </div>
+                    </div>
+                    <div class="form-group input-number">
+                        <div class="input-group">
+                            <span class="input-group-addon input-label"></span>
+                            <span class="text-danger input-error"></span>
+                            <input name="" type="number" class="form-control" value="">
+                        </div>
+                    </div>
+                    <div class="form-group input-select">
+                        <div class="input-group">
+                            <select class="custom-select" name="">
+                                <option value="-1">Open this select menu</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group input-radio">
+                        <div class="input-group">
+                            <span class="input-group-addon input-label"></span>
+                            <input name="" type="radio" value="trial_package" class="form-control" checked>Trial
+                            package </br>
+                            <input name="" type="radio" value="promotional_gift" class="form-control">Promotional
+                            package
+                        </div>
+                    </div>
+                    <div class="cancel-submit-buttons">
+                        <p class="btn btn-default cancel-button">Cancel</p>
+                        <button type="submit" class="btn btn-success submit-button">Save</button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <script>
-            $(document).ready(function () {
-                let $menuSection = $(".homepage .menu-section");
-                let $innerItem = $menuSection.children();
-                let $orderItem, $beverageItem, $incentiveItem, $reportItem;
-                $beverageItem = $innerItem.clone();
-                $reportItem = $innerItem.clone();
-                $orderItem = $innerItem.clone();
-                $incentiveItem = $innerItem.clone();
-
-                let orderItemText = $orderItem.find(".btn").attr("data-menu", "orderMenu");
-                orderItemText.text("CREATE NEW ORDER");
-                let beverageItemText = $beverageItem.find(".btn").attr("data-menu", "beverageMenu");
-                beverageItemText.text("MANAGE BEVERAGES");
-                let incentiveItemText = $incentiveItem.find(".btn").attr("data-menu", "incentiveMenu");
-                incentiveItemText.text("MANAGE INCENTIVES");
-                let reportItemText = $reportItem.find(".btn").attr("data-menu", "reportMenu");
-                reportItemText.text("VIEW SALES REPORT");
-
-                $menuSection.empty();
-                $menuSection.append($orderItem);
-                $menuSection.append($beverageItem);
-                $menuSection.append($incentiveItem);
-                $menuSection.append($reportItem);
-            });
-        </script>
 
     </body>
 </html>
+
+<script>
+    $(document).ready(function () {
+        $(".homepage").show();
+        let $menuSection = $(".homepage .menu-section");
+        let $innerItem = $menuSection.children();
+        let $orderItem, $beverageItem, $incentiveItem, $reportItem;
+        $beverageItem = $innerItem.clone();
+        $reportItem = $innerItem.clone();
+        $orderItem = $innerItem.clone();
+        $incentiveItem = $innerItem.clone();
+
+        let orderItemText = $orderItem.find(".btn").attr("data-menu", "orderMenu");
+        orderItemText.text("CREATE NEW ORDER");
+        let beverageItemText = $beverageItem.find(".btn").attr("data-menu", "beverageMenu");
+        beverageItemText.text("MANAGE BEVERAGES");
+        let incentiveItemText = $incentiveItem.find(".btn").attr("data-menu", "incentiveMenu");
+        incentiveItemText.text("MANAGE INCENTIVES");
+        let reportItemText = $reportItem.find(".btn").attr("data-menu", "reportMenu");
+        reportItemText.text("VIEW SALES REPORT");
+
+        $menuSection.empty();
+        $menuSection.append($orderItem);
+        $menuSection.append($beverageItem);
+        $menuSection.append($incentiveItem);
+        $menuSection.append($reportItem);
+    });
+</script>

@@ -1,10 +1,14 @@
-
-$(document).on("click", ".menu-section .row .btn", function (e){
+function adjustContentPage() {
     $(".container").removeAttr("align");
     $(".dynamic-content").remove();
     $(".homepage").hide();
     let $dataContent = $(".data-content").clone();
     $dataContent.addClass("dynamic-content");
+    return $dataContent;
+}
+
+$(document).on("click", ".menu-section .row .btn", function (){
+    let $dataContent = adjustContentPage();
 
     let $dataItem = $(this).attr("data-menu");
     let columns;
@@ -42,7 +46,7 @@ $(document).on("click", ".menu-section .row .btn", function (e){
     }
 });
 
-$(document).on("click", ".home-button", function (e){
+$(document).on("click", ".home-button", function (){
     $(".dynamic-content").remove();
     $(".homepage").show();
 });
@@ -81,15 +85,20 @@ function populateTable($data){
         let $props = [];
         if ($data.resource == "incentives"){
             $props = ["id", "name", "incentive_type"];
+            $(".dynamic-content .create-button").attr("data-resource", "incentives")
         }
         else if ($data.resource == "beverages"){
             $props = ["id", "name", "manufacturer", "quantity", "price", "incentiveId", "incentiveName", "incentiveType"];
+            $(".dynamic-content .create-button").attr("data-resource", "beverages")
         }
         else if ($data.resource == "customerOrder"){
             $props = ["manufacturer", "name", "price", "quantity", "incentiveName"];
         }
         else if ($data.resource == "sales-report/summary"){
             $props = ["customerOrderId", "revenue"];
+        }
+        else if ($data.resource == "customer_order"){
+            $props = ["manufacturer", "name", "price", "incentiveName", "orderAmount"];
         }
         for (let i=0; i<$data.length; i++){
             let $rowItem = $rowDef.clone();
@@ -106,6 +115,12 @@ function populateTable($data){
             }
             else if ($data.resource == "customerOrder"){
                 $data[i].incentiveName = $data[i].incentiveDTO != null ? $data[i].incentiveDTO.name : "-";
+            }
+            else if ($data.resource == "customer_order"){
+                $data[i].manufacturer = $data[i].beverageDTO.manufacturer;
+                $data[i].name = $data[i].beverageDTO.name;
+                $data[i].price = $data[i].beverageDTO.price;
+                $data[i].incentiveName = $data[i].beverageDTO.incentiveDTO != null ? $data[i].beverageDTO.incentiveDTO.name : "-";
             }
 
             $props.forEach($property => {
@@ -125,7 +140,7 @@ function populateTable($data){
                 $rowItem.append($actionColumn);
                 $(".dynamic-content .order-submit-button").show();
             }
-            else if (!$data.resource.includes("sales-report")){
+            else if ($data.resource == "incentives" || $data.resource == "beverages"){
                 $actionColumn = '<td><p><a class="btn btn-primary update" data-resource="'+$data.resource+'" ' +
                     'data-id="'+$data[i].id+'">Update</a> <a class="btn btn-primary delete" ' +
                     'data-resource="'+$data.resource+'" data-id="'+$data[i].id+'">Delete</a> </p></td>';

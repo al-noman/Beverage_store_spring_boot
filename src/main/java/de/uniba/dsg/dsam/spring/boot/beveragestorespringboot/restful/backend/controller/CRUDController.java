@@ -68,6 +68,7 @@ public abstract class CRUDController<ENTITY extends WithIdAndVersion, DTO extend
     }
 
     @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteOne(@PathVariable int id){
         Optional<ENTITY> maybeEntity = this.crudService.getOne(id);
         maybeEntity.orElseThrow(() -> new EntityNotFoundException(id));
