@@ -1,28 +1,40 @@
 $(document).on("click", ".create-button", function (){
-    $(".dynamic-content").hide();
-    let $form = $(".form-page").clone();
-    $form.addClass("dynamic-form");
-    $form.removeClass("form-page")
-    $(".container").append($form);
-    $form.find("form").empty();
-    $form.show();
-
+    let $form = createFormContent();
     let $resource = $(this).attr("data-resource");
+    createFormDefinition($resource, $form, "New Beverage", null, "create");
+});
+
+$(document).on("click", ".btn.update", function (){
+    let $form = createFormContent();
+    let $resource = $(this).data("resource");
+    let $row = $(this).closest("tr");
+    let $data, $title, $dataArray = [];
+    $row.find("td").each(function (){
+        $dataArray.push($(this).text());
+    });
+
     if ($resource == "beverages"){
-        $form.find(".form-title").text("New Beverage");
-        createFormField($form, "text", "Beverage Name", "beverage_name");
-        createFormField($form, "text", "Beverage Manufacturer", "beverage_manufacturer");
-        createFormField($form, "number", "Quantity", "beverage_quantity");
-        createFormField($form, "number", "Price", "beverage_price");
-        // let $selectField = $form.find(".input-select").clone();
-        createCancelSubmitButtons($form, $resource);
+        $data = {
+            id: $dataArray[1],
+            beverage_name: $dataArray[2],
+            beverage_manufacturer: $dataArray[3],
+            beverage_quantity: $dataArray[4],
+            beverage_price: $dataArray[5],
+            incentiveId: $dataArray[6],
+            incentiveName: $dataArray[7],
+            incentiveType: $dataArray[8]
+        }
+        $title = "Update Beverage";
     }
     else if ($resource == "incentives"){
-        $form.find(".form-title").text("New Incentive");
-        createFormField($form, "text", "Incentive Name", "incentive_name");
-        createFormField($form, "radio", "Incentive type", "incentive_type");
-        createCancelSubmitButtons($form, $resource);
+        $data = {
+            id: $dataArray[1],
+            incentive_name: $dataArray[2],
+            incentive_type: $dataArray[3]
+        }
+        $title = "Update Incentive";
     }
+    createFormDefinition($resource, $form, $title, $data, "update");
 });
 
 $(document).on("click", ".cancel-button", function (){
@@ -32,40 +44,72 @@ $(document).on("click", ".cancel-button", function (){
 
 $(document).on("click", ".submit-button", function (e){
     e.preventDefault();
-    $resource = $(this).data("resource")
+    let $resource = $(this).data("resource");
+    let $action = $(this).data("action");
+    let $callbackMethod, $httpMethod, $data;
 
     if ($resource == "beverages"){
         let $name = $('input[name="beverage_name"]').val();
         let $manufacturer = $('input[name="beverage_manufacturer"]').val();
         let $quantity = $('input[name="beverage_quantity"]').val();
         let $price = $('input[name="beverage_price"]').val();
-        let $beverage = {
+        $data = {
             name: $name,
             manufacturer: $manufacturer,
             quantity: $quantity,
             price: $price
         }
-        console.log($beverage);
-        postFormData($resource, $beverage, postMethodCallback);
+        if ($action == 'update'){
+            let $id = $(this).data("id");
+            $data.id = $id;
+            let $selectedIncentive = $(".dynamic-form .custom-select option:selected");
+            if ($selectedIncentive.val() != -1){
+                let incentiveDto = {
+                    "id": $selectedIncentive.data("id"),
+                    "incentive_type": $selectedIncentive.data("type"),
+                    "version": $selectedIncentive.data("version"),
+                    "name": $selectedIncentive.val()
+                }
+                $data.incentiveDTO = incentiveDto;
+            }
+            $resource = $resource + "/"+$id;
+            $callbackMethod = updateMethodCallback;
+            $httpMethod = 'PUT';
+        }
+        else {
+            $callbackMethod = postMethodCallback;
+            $httpMethod = 'POST';
+        }
     }
     else if ($resource == "incentives"){
         let $name = $('input[name="incentive_name"]').val();
-        let $incentive_type = "trial_package";
-        $incentive_type = $('input[name="incentive_type"]:checked').val();
-        let $incentive = {
+        let $incentive_type = $('input[name="incentive_type"]:checked').val();
+        if (!$incentive_type){
+            $incentive_type = $(this).data("type");
+        }
+        $data = {
             name: $name,
             incentive_type: $incentive_type
         }
-        console.log($incentive);
-        postFormData($resource, $incentive, postMethodCallback);
+        if ($action == 'update') {
+            let $id = $(this).data("id");
+            $data.id = $id;
+            $resource = $resource + "/"+$id;
+            $callbackMethod = updateMethodCallback;
+            $httpMethod = 'PUT';
+        }
+        else {
+            $callbackMethod = postMethodCallback;
+            $httpMethod = 'POST';
+        }
     }
+    postFormData($resource, $data, $callbackMethod, $httpMethod);
 });
 
 $(document).on("click", ".order-button", function (){
     let $customerOrder = [];
     let $checkedBeverages = $("input[name='selectedBeverage']:checked");
     if ($checkedBeverages.length == 0) {
-        console.log("No checkbox is checked...");
         alert("Nothing selected. Please make your selection!");
         return false;
     } else {
@@ -85,9 +129,60 @@ $(document).on("click", ".order-button", function (){
             $customerOrder.push($order);
         }
     }
-    console.log(JSON.stringify($customerOrder));
-    postFormData("customer_order", $customerOrder, customerOrderCreateConfirmation);
+    postFormData("customer_order", $customerOrder, customerOrderCreateConfirmation, 'POST');
 });
+
+function createFormContent(){
+    $(".dynamic-content").hide();
+    let $form = $(".form-page").clone();
+    $form.addClass("dynamic-form");
+    $form.removeClass("form-page")
+    $(".container").append($form);
+    $form.find("form").empty();
+    $form.show();
+    return $form;
+}
+
+function createFormDefinition($resource, $form, $titleText, $data, $action){
+    if ($resource == "beverages"){
+        $form.find(".form-title").text($titleText);
+        createFormField($form, "text", "Beverage Name", "beverage_name", $data);
+        createFormField($form, "text", "Beverage Manufacturer", "beverage_manufacturer", $data);
+        createFormField($form, "number", "Quantity", "beverage_quantity", $data);
+        createFormField($form, "number", "Price", "beverage_price", $data);
+
+        if ($action == 'update'){
+            $.get( "/incentives", function( $result ) {
+                populateIncentivesInDropDown($result, $data.incentiveId)
+            }, "json" );
+            // getDataFromBackend("incentives", populateIncentivesInDropDown);
+        }
+        createCancelSubmitButtons($form, $resource, $action, $data);
+    }
+    else if ($resource == "incentives"){
+        $form.find(".form-title").text($titleText);
+        createFormField($form, "text", "Incentive Name", "incentive_name", $data);
+        if ($action == "create"){
+            createFormField($form, "radio", "Incentive type", "incentive_type", $data);
+        }
+        createCancelSubmitButtons($form, $resource, $action, $data);
+    }
+}
+
+function populateIncentivesInDropDown($data, $incentiveId){
+    let $selectDiv = $(".form-page .input-select").clone();
+    let $selectBlock = $selectDiv.find(".custom-select");
+    $data.forEach($incentive => {
+        let selectStr = "";
+        if ($incentive.id == $incentiveId){
+            selectStr = "selected";
+        }
+        let $option = '<option value="'+$incentive.name+'" data-id="'+$incentive.id+'" data-type="'+
+            $incentive.incentive_type+'" data-version="'+$incentive.version+'" '+selectStr+'>'+$incentive.name+'</option>';
+        $selectBlock.append($option);
+    });
+    $(".dynamic-form .cancel-submit-buttons").before($selectDiv);
+}
 
 function customerOrderCreateConfirmation($data){
     let $dataContent = adjustContentPage();
@@ -97,7 +192,7 @@ function customerOrderCreateConfirmation($data){
     populateTable($data);
 }
 
-function createFormField($form, $inputType, $inputLabel, $inputName){
+function createFormField($form, $inputType, $inputLabel, $inputName, $data){
     let $field;
     if ($inputType == "text"){
         $field = $(".form-page .input-text").clone();
@@ -111,17 +206,26 @@ function createFormField($form, $inputType, $inputLabel, $inputName){
     $form.append($field);
     $field.find(".input-label").text($inputLabel);
     $field.find("input").attr("name", $inputName);
+    if ($data){
+        $field.find("input").val($data[$inputName]);
+    }
 }
 
-function createCancelSubmitButtons($form, $resource){
+function createCancelSubmitButtons($form, $resource, $action, $data){
     $buttons = $(".form-page .cancel-submit-buttons").clone();
     $form.append($buttons);
     $buttons.find(".cancel-button").attr("data-resource", $resource);
     $buttons.find(".submit-button").attr("data-resource", $resource);
+    $buttons.find(".submit-button").attr("data-action", $action);
+    if ($data){
+        $buttons.find(".submit-button").attr("data-id", $data.id);
+    }
+    if ($resource = "incentives" && $action == "update"){
+        $buttons.find(".submit-button").attr("data-type", $data.incentive_type);
+    }
 }
 
 function postMethodCallback($data){
-    console.log($data);
     let $tableBody = $(".dynamic-content tbody");
     let $rowNumber = $tableBody.find("tr").length + 1;
     let $newRow, $actionColumn = populateActionColumn($data);
@@ -143,6 +247,30 @@ function postMethodCallback($data){
     $(".dynamic-form").remove();
 }
 
+function updateMethodCallback($data){
+    let $idColumn = $(".dynamic-content td:nth-child(2)").filter(function(){
+        return $(this).text() == $data.id;
+    });
+    let $targetRow = $idColumn.closest("tr");
+    if ($data.resource.includes("beverages")){
+        $targetRow.find("td:nth-child(3)").text($data.name);
+        $targetRow.find("td:nth-child(4)").text($data.manufacturer);
+        $targetRow.find("td:nth-child(5)").text($data.quantity);
+        $targetRow.find("td:nth-child(6)").text($data.price);
+        if ($data.incentiveDTO){
+            $targetRow.find("td:nth-child(7)").text($data.incentiveDTO.id);
+            $targetRow.find("td:nth-child(8)").text($data.incentiveDTO.name);
+            $targetRow.find("td:nth-child(9)").text($data.incentiveDTO.incentive_type);
+        }
+    }
+    else if ($data.resource.includes("incentives")){
+        $targetRow.find("td:nth-child(3)").text($data.name);
+        $targetRow.find("td:nth-child(4)").text($data.incentive_type);
+    }
+    $(".dynamic-content").show();
+    $(".dynamic-form").remove();
+}
+
 function populateActionColumn($data){
     let $actionColumn = '<td><p><a class="btn btn-primary update" data-resource="'+$data.resource+'" ' +
         'data-id="'+$data.id+'">Update</a> <a class="btn btn-primary delete" ' +
@@ -150,22 +278,20 @@ function populateActionColumn($data){
     return $actionColumn;
 }
 
-function postFormData($resource, $data, postMethodCallback){
+function postFormData($resource, $data, postMethodCallback, $httpMethod){
     $.ajax({
         url: '/' + $resource,
-        type: 'POST',
+        type: $httpMethod,
         contentType: "application/json",
         dataType: "json",
         data: JSON.stringify($data),
         success: function (data, textStatus, jqxhr) {
-            console.log("request successful");
             data.status = textStatus;
             data.statusCode = jqxhr.status;
             data.resource = $resource;
             postMethodCallback(data);
         },
         error: function (jqxhr){
-            console.log("request failed");
             let data = jqxhr.responseJSON;
             data.status = jqxhr.statusText;
             data.statusCode = jqxhr.status;

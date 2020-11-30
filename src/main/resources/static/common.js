@@ -76,7 +76,6 @@ function createTableDefinition($contentLabel, $createButtonText, $dataContent, $
 
 function populateTable($data){
     if ($data.status == "success"){
-        console.log($data);
         let $columnDef = $(".dynamic-content").find("table tbody tr td").clone();
         let $rowDef = $(".dynamic-content").find("table tbody tr").clone();
         let $tableDef = $(".dynamic-content").find("table tbody");
