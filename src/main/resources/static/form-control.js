@@ -37,6 +37,14 @@ $(document).on("click", ".btn.update", function (){
     createFormDefinition($resource, $form, $title, $data, "update");
 });
 
+$(document).on("click", ".btn.delete", function (){
+    if (confirm("Are you sure you want to delete this item?")){
+        let $id = $(this).data("id");
+        let $resource = $(this).data("resource") + "/" + $id;
+        deleteResource($resource);
+    }
+});
+
 $(document).on("click", ".cancel-button", function (){
     $(".dynamic-content").show();
     $(".dynamic-form").remove();
@@ -155,7 +163,6 @@ function createFormDefinition($resource, $form, $titleText, $data, $action){
             $.get( "/incentives", function( $result ) {
                 populateIncentivesInDropDown($result, $data.incentiveId)
             }, "json" );
-            // getDataFromBackend("incentives", populateIncentivesInDropDown);
         }
         createCancelSubmitButtons($form, $resource, $action, $data);
     }
@@ -290,6 +297,7 @@ function postFormData($resource, $data, postMethodCallback, $httpMethod){
             data.statusCode = jqxhr.status;
             data.resource = $resource;
             postMethodCallback(data);
+            showStatusMessage($resource, $httpMethod, "success");
         },
         error: function (jqxhr){
             let data = jqxhr.responseJSON;
@@ -297,6 +305,63 @@ function postFormData($resource, $data, postMethodCallback, $httpMethod){
             data.statusCode = jqxhr.status;
             data.resource = $resource;
             postMethodCallback(data);
+            showStatusMessage($resource, $httpMethod, "error");
         }
     });
+}
+
+function deleteResource($resource){
+    $.ajax({
+        type: "DELETE",
+        url: $resource,
+        success: function () {
+            if ($resource.includes("beverage")){
+                $(".menu-section").find("p.btn[data-menu='beverageMenu']").click();
+            }
+            else if ($resource.includes("incentives")){
+                $(".menu-section").find("p.btn[data-menu='incentiveMenu']").click();
+            }
+            showStatusMessage($resource, "DELETE", "success");
+        },
+        error: function (err) {
+            console.log(err);
+            showStatusMessage($resource, "DELETE", "error");
+        }
+    });
+}
+
+function showStatusMessage($resource, $httpMethod, $status){
+    let replaceWord = "", message = "";
+    if ($resource.includes("beverages")){
+        $resource = "Beverage";
+    }
+    else if ($resource.includes("incentives")){
+        $resource = "Incentive";
+    }
+    if ($httpMethod == "POST"){
+        replaceWord = " created ";
+    }
+    else if ($httpMethod == "PUT"){
+        replaceWord = " updated ";
+    }
+    else if ($httpMethod == "DELETE"){
+        replaceWord = " deleted ";
+    }
+
+    if ($status == "success"){
+        message = $resource + replaceWord + "successfully";
+        $('.text-success').text(message);
+        $('.text-success').fadeIn();
+        setTimeout(function() {
+            $('.text-success').fadeOut("slow");
+        }, 2000 );
+    }
+    else {
+        message = $resource + " couldn't be" + replaceWord;
+        $('.text-danger').text(message);
+        $('.text-danger').fadeIn();
+        setTimeout(function() {
+            $('.text-danger').fadeOut("slow");
+        }, 2000 );
+    }
 }

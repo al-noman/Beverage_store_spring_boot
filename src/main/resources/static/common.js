@@ -39,7 +39,6 @@ $(document).on("click", ".menu-section .row .btn", function (){
                 $dataContent, columns);
             getDataFromBackend("sales-report/summary", populateTable);
             $(".dynamic-content .home-button").remove();
-            getDataFromBackend("sales-report/detail", populateDetailReportTable);
             break;
        default:
            console.log("something else");
@@ -95,6 +94,7 @@ function populateTable($data){
         }
         else if ($data.resource == "sales-report/summary"){
             $props = ["customerOrderId", "revenue"];
+            getDataFromBackend("sales-report/detail", populateDetailReportTable);
         }
         else if ($data.resource == "customer_order"){
             $props = ["manufacturer", "name", "price", "incentiveName", "orderAmount"];
@@ -181,7 +181,6 @@ function getDataFromBackend($resource, callbackMethod){
         type: 'GET',
         dataType: "json",
         success: function (data, textStatus, jqxhr) {
-            console.log("request successful");
             data.status = textStatus;
             data.statusCode = jqxhr.status;
             data.resource = $resource;
