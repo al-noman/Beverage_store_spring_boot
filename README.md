@@ -15,5 +15,6 @@ Contains `docker-compose.yml` file for creating docker container for 3 server.
 
 
 Frontend:
-HTML for templating
-Javascript ES6, jQuery and AJAX for invoking API
+1) HTML for templating
+2) Javascript ES6, and jQuery 
+3) AJAX for invoking API
